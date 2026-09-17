@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 
-/**
- * Walks the current ProseMirror document and returns every heading as
- * `{ pos, level, text }`, recomputed on every editor transaction. Powers
- * the outline sidebar — clicking an entry jumps the cursor (and viewport)
- * to that heading.
- */
+
 export function useOutline(editor) {
   const [headings, setHeadings] = useState([]);
 

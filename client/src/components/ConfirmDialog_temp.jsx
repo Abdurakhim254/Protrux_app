@@ -2,13 +2,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * A themed confirm dialog to replace window.confirm(), which renders as an
- * unstyled browser chrome popup that clashes with the rest of the app.
- * Rendered via a portal into document.body so it never inherits click
- * handlers or stacking-context quirks from whatever card/list it was
- * triggered from.
- */
+
 export default function ConfirmDialog({
   open,
   title,

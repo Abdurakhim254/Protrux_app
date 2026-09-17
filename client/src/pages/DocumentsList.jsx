@@ -38,9 +38,6 @@ export default function DocumentsList() {
       const doc = await api.createDocument('Без названия');
       navigate(`/d/${doc.id}`);
     } catch {
-      // Offline: still let the person start writing. A local-only id is
-      // created; it will register itself with the server once reconnected
-      // (the editor room is created lazily on first WebSocket connection).
       const localId = `local-${crypto.randomUUID().slice(0, 12)}`;
       navigate(`/d/${localId}`);
     } finally {
@@ -52,10 +49,7 @@ export default function DocumentsList() {
     setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, title } : d)));
     try {
       await api.renameDocument(id, title);
-    } catch {
-      /* offline — the card already reflects the new title locally; the
-         document's own Yjs title field will pick it up once it's opened */
-    }
+    } catch { }
     refresh();
   }
 
@@ -63,9 +57,7 @@ export default function DocumentsList() {
     setDocs((prev) => prev.filter((d) => d.id !== id));
     try {
       await api.deleteDocument(id);
-    } catch {
-      /* offline: nothing more we can do here until reconnected */
-    }
+    } catch { }
   }
 
   return (

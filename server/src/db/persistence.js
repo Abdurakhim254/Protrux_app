@@ -1,9 +1,6 @@
 import * as Y from 'yjs';
 import { db } from './database.js';
 
-// After this many un-compacted updates for a document, we merge everything
-// into a fresh snapshot and clear the log. Keeps the table small and keeps
-// document load time constant instead of growing with edit history.
 const COMPACT_THRESHOLD = 150;
 
 const stmts = {
@@ -26,8 +23,6 @@ const stmts = {
   clearUpdates: db.prepare('DELETE FROM doc_updates WHERE doc_id = ?'),
 };
 
-// node:sqlite's DatabaseSync has no built-in `.transaction()` helper (unlike
-// better-sqlite3), so we wrap the two multi-statement operations by hand.
 function inTransaction(fn) {
   db.exec('BEGIN');
   try {
@@ -66,10 +61,7 @@ export function touchDocument(id) {
   stmts.touchDoc.run(Date.now(), id);
 }
 
-/**
- * Load a document's full Yjs state (snapshot merged with any updates that
- * arrived since the last compaction) into the given Y.Doc instance.
- */
+
 export function loadIntoYDoc(docId, ydoc) {
   const snapshot = stmts.getSnapshot.get(docId);
   if (snapshot) {
@@ -82,11 +74,7 @@ export function loadIntoYDoc(docId, ydoc) {
   return ydoc;
 }
 
-/**
- * Durably append one incremental update. Called on every change broadcast
- * from any connected client so nothing is ever lost, even if the process
- * crashes before the next compaction.
- */
+
 export function appendUpdate(docId, update) {
   stmts.insertUpdate.run(docId, Buffer.from(update), Date.now());
   touchDocument(docId);
@@ -96,11 +84,7 @@ export function appendUpdate(docId, update) {
   }
 }
 
-/**
- * Merge the snapshot + all pending updates into a single new snapshot and
- * clear the log. Uses a temporary Y.Doc so it never touches the live,
- * in-memory room document.
- */
+
 export function compact(docId) {
   const tmp = new Y.Doc();
   loadIntoYDoc(docId, tmp);
@@ -112,7 +96,7 @@ export function compact(docId) {
   tmp.destroy();
 }
 
-/** Force-persist the current full state of a live Y.Doc (e.g. on room close). */
+
 export function snapshotYDoc(docId, ydoc) {
   const state = Y.encodeStateAsUpdate(ydoc);
   inTransaction(() => {
@@ -121,15 +105,7 @@ export function snapshotYDoc(docId, ydoc) {
   });
 }
 
-/**
- * Extract a short plain-text preview from a document's stored content, for
- * showing on the documents grid without shipping the whole Yjs state to the
- * client. Tiptap's Collaboration extension binds to a Y.XmlFragment named
- * 'default' — we walk it manually (no ProseMirror schema needed on the
- * server) and concatenate text runs via Y.XmlText#toDelta(), which gives us
- * plain inserted text without the formatting tags Y.XmlText#toString()
- * would otherwise embed.
- */
+
 export function getPreviewText(docId, maxLen = 180) {
   const tmp = new Y.Doc();
   loadIntoYDoc(docId, tmp);

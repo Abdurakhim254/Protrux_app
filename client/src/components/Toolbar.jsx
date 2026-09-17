@@ -39,7 +39,6 @@ function SwatchPicker({ title, swatches, onPick, onClear, current }) {
   const menuRef = useRef(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
 
-  // Calculate menu position from the trigger button
   useEffect(() => {
     if (!open || !triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
@@ -49,7 +48,6 @@ function SwatchPicker({ title, swatches, onPick, onClear, current }) {
     });
   }, [open]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const close = (e) => {

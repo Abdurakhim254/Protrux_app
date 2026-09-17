@@ -49,27 +49,17 @@ export default function EditorPage() {
 
   const { ydoc, provider, localReady, connected, synced } = useCollaborativeDoc(docId, identity);
   const peers = usePresence(provider);
-
-  // Document title lives inside the Yjs doc itself (a small shared map), so
-  // renames sync in real time and survive offline edits just like the body.
-  // ydoc may be null briefly while the effect initialises, so guard access.
   const meta = useMemo(() => ydoc?.getMap('meta') ?? null, [ydoc]);
   const [title, setTitle] = useState('');
   const titleSaveTimer = useRef(null);
 
   useEffect(() => {
     if (!meta) return;
-    // Initialise title from the Yjs map once it becomes available
     setTitle(meta.get('title') || '');
     const onMetaChange = () => setTitle(meta.get('title') || '');
     meta.observe(onMetaChange);
     return () => meta.unobserve(onMetaChange);
   }, [meta]);
-
-  // If this document was renamed from the list page before anyone ever
-  // opened it, the REST title and the Yjs title can briefly disagree (the
-  // list only patches SQLite). Once we're locally synced, adopt the REST
-  // title into the shared doc if the doc itself has no title of its own yet.
   useEffect(() => {
     if (!localReady || !meta || meta.get('title')) return;
     api
@@ -77,9 +67,7 @@ export default function EditorPage() {
       .then((doc) => {
         if (doc?.title && !meta.get('title')) meta.set('title', doc.title);
       })
-      .catch(() => {
-        /* offline or a brand-new local-only doc: nothing to reconcile yet */
-      });
+      .catch(() => { });
   }, [localReady, meta, docId]);
 
   function handleTitleChange(value) {
@@ -87,11 +75,7 @@ export default function EditorPage() {
     meta.set('title', value);
     clearTimeout(titleSaveTimer.current);
     titleSaveTimer.current = setTimeout(() => {
-      api.renameDocument(docId, value || 'Без названия').catch(() => {
-        /* offline: the Yjs update above already persisted locally via
-           IndexedDB and will reach the server's document record once the
-           title field is next read by a connected client */
-      });
+      api.renameDocument(docId, value || 'Без названия').catch(() => { });
     }, 500);
   }
 

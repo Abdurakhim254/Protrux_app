@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * A small floating menu triggered by a "⋮" button. Closes on outside click,
- * Escape, or when an item is chosen. `items` is an array of
- * `{ label, onSelect, danger?, icon? }`.
- */
+
 export default function DropdownMenu({ items, label = 'Действия' }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);

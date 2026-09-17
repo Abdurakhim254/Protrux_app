@@ -2,13 +2,7 @@ import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness.js';
 import { loadIntoYDoc, appendUpdate, snapshotYDoc, getDocumentMeta, createDocument } from '../db/persistence.js';
 
-/**
- * A Room holds the single source-of-truth Y.Doc for one document on this
- * server process, plus the Awareness state (who's online, cursors, colors)
- * and the set of currently connected sockets. Every socket editing the same
- * document shares this one Y.Doc — the CRDT itself guarantees that whatever
- * order updates arrive in, all clients converge to the same content.
- */
+
 class Room {
   constructor(docId) {
     this.docId = docId;
@@ -22,11 +16,8 @@ class Room {
       createDocument(docId, 'Без названия');
     }
     loadIntoYDoc(docId, this.ydoc);
-
-    // Persist every incremental change immediately (durable log), and also
-    // batch a full snapshot shortly after activity settles.
     this.ydoc.on('update', (update, origin) => {
-      if (origin === 'persistence') return; // avoid re-persisting what we just loaded
+      if (origin === 'persistence') return;
       appendUpdate(docId, update);
       this._scheduleIdleSnapshot();
     });
@@ -44,8 +35,6 @@ class Room {
   }
 
   removeConn(conn) {
-    // Awareness state for this connection's clientIDs is already cleared by
-    // the caller (see connection.js `cleanup`) before this runs.
     this.conns.delete(conn);
     if (this.conns.size === 0) {
       clearTimeout(this.persistTimer);

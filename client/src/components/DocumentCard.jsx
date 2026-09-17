@@ -1,4 +1,3 @@
-// client/src/components/DocumentCard.jsx  (ТЎЛИҚ АЛМАШТИРИНГ)
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api.js';
 import DropdownMenu from './DropdownMenu.jsx';
@@ -27,9 +26,7 @@ export default function DocumentCard({ doc, onOpen, onRename, onDelete }) {
       .then((res) => {
         if (!cancelled) setPreview(res?.preview || '');
       })
-      .catch(() => {
-        /* offline or brand-new doc: no preview yet, card just shows the title */
-      });
+      .catch(() => { });
     return () => {
       cancelled = true;
     };

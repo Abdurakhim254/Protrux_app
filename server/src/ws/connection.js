@@ -21,19 +21,13 @@ function send(conn, encoder) {
   }
 }
 
-/**
- * One connection = one browser tab. Tracks which awareness clientIDs it
- * "owns" so we can clear cursors/presence for this tab the instant it
- * disconnects (see rooms.js removeConn).
- */
+
 export function handleConnection(ws, docId, req) {
   const room = getRoom(docId);
   const conn = { ws, docId, controlledClientIDs: new Set() };
   room.addConn(conn);
 
   ws.binaryType = 'arraybuffer';
-
-  // --- initial handshake: server sends SyncStep1 + current awareness ---
   {
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, MSG_SYNC);
@@ -53,7 +47,7 @@ export function handleConnection(ws, docId, req) {
   }
 
   const updateHandler = (update, origin) => {
-    if (origin === conn) return; // don't echo back to the sender
+    if (origin === conn) return;
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, MSG_SYNC);
     syncProtocol.writeUpdate(encoder, update);
@@ -89,15 +83,12 @@ export function handleConnection(ws, docId, req) {
         case MSG_AWARENESS: {
           const update = decoding.readVarUint8Array(decoder);
           awarenessProtocol.applyAwarenessUpdate(room.awareness, update, conn);
-          // Track which clientIDs this connection introduced, so that if the
-          // socket drops we know exactly which cursors/presence to clear.
-          // Format written by encodeAwarenessUpdate: [numClients, (clientID, clock, stateJSON)...]
           const d = decoding.createDecoder(update);
           const numClients = decoding.readVarUint(d);
           for (let i = 0; i < numClients; i++) {
             const clientID = decoding.readVarUint(d);
-            decoding.readVarUint(d); // clock, unused here
-            decoding.readVarString(d); // state json, unused here
+            decoding.readVarUint(d);
+            decoding.readVarString(d);
             conn.controlledClientIDs.add(clientID);
           }
           break;

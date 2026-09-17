@@ -1,7 +1,6 @@
 const STORAGE_KEY = 'inkwell:identity';
 
-// "Цвета пера" — палитра присутствия, а не случайный radix. Порядок фиксирован,
-// каждому новому автору достаётся следующий цвет по кругу.
+
 export const PEN_COLORS = [
   'var(--pen-1)',
   'var(--pen-2)',
@@ -22,9 +21,6 @@ function randomName() {
 }
 
 function resolvedColor(colorToken) {
-  // Resolve a CSS variable like 'var(--pen-1)' to its hex value so libraries
-  // that can't read custom properties (e.g. constructing inline SVG cursors
-  // before mount) still get a real color.
   if (typeof window === 'undefined') return '#2f5d62';
   const varName = colorToken.match(/--[\w-]+/)?.[0];
   if (!varName) return colorToken;
@@ -39,9 +35,7 @@ export function getIdentity() {
       const parsed = JSON.parse(raw);
       if (parsed.name && parsed.color) return parsed;
     }
-  } catch {
-    /* ignore corrupt storage */
-  }
+  } catch { }
   const identity = {
     id: crypto.randomUUID(),
     name: randomName(),
