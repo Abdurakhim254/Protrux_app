@@ -1,0 +1,25 @@
+{
+  "name": "inkwell-server",
+  "version": "1.0.0",
+  "description": "Inkwell backend: REST API + Yjs WebSocket sync + SQLite persistence (node:sqlite, no native build step)",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node --experimental-sqlite --no-warnings src/index.js",
+    "dev": "node --experimental-sqlite --no-warnings --watch src/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "lib0": "^0.2.117",
+    "nanoid": "^3.3.19",
+    "ws": "^8.21.3",
+    "y-protocols": "^1.0.7",
+    "yjs": "^13.6.32"
+  }
+}

@@ -1,0 +1,100 @@
+/* ==========================================================================
+   Inkwell — design tokens
+   Тема: письменный стол / чернильница. Тёплая бумага, чернильный текст,
+   морская волна как рабочий акцент, состаренная латунь — как акцент курсивом,
+   и палитра "цветов пера" для присутствия соавторов.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* --- Color: surfaces --- */
+  --paper: #f1efe6;
+  --paper-raised: #faf8f2;
+  --paper-dim: #e7e2d2;
+  --paper-dim-2: #ddd6c1;
+
+  /* --- Color: ink (text/UI) --- */
+  --ink: #1b2a2f;
+  --ink-soft: #4a5a58;
+  --ink-faint: #7c8683;
+
+  /* --- Color: accents --- */
+  --marine: #2f5d62;
+  --marine-dark: #20464a;
+  --marine-tint: #dbe6e4;
+  --brass: #b3812f;
+  --brass-tint: #ecdfc0;
+  --wax: #a8402f;
+  --wax-tint: #f1ddd6;
+
+  /* --- Color: rules/borders --- */
+  --rule: #d9d3c1;
+  --rule-strong: #c3bba3;
+
+  /* --- Presence palette: rotates for collaborators' cursors/avatars --- */
+  --pen-1: #2f5d62; /* marine */
+  --pen-2: #b3812f; /* brass */
+  --pen-3: #a8402f; /* wax */
+  --pen-4: #5c6b2e; /* olive */
+  --pen-5: #7a4a68; /* plum */
+  --pen-6: #35637f; /* slate blue */
+
+  /* --- Type --- */
+  --font-display: 'Fraunces', 'Iowan Old Style', serif;
+  --font-document: 'Source Serif 4', Georgia, serif;
+  --font-ui: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* --- Scale --- */
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --shadow-paper: 0 1px 2px rgba(27, 42, 47, 0.06), 0 6px 20px rgba(27, 42, 47, 0.07);
+  --shadow-pop: 0 4px 18px rgba(27, 42, 47, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--marine);
+}
+
+::selection {
+  background: var(--brass-tint);
+}
+
+:focus-visible {
+  outline: 2px solid var(--marine);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
