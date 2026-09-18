@@ -8,6 +8,7 @@ import {
   deleteDocument,
   getPreviewText,
 } from '../db/persistence.js';
+import { rooms } from '../ws/rooms.js';
 
 export const documentsRouter = Router();
 
@@ -42,7 +43,19 @@ documentsRouter.patch('/:id', (req, res) => {
   const existing = getDocumentMeta(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not_found' });
   const title = (req.body && req.body.title) ?? existing.title;
-  res.json(renameDocument(req.params.id, title));
+  const updatedDoc = renameDocument(req.params.id, title);
+
+  // If document is open in an active room, update Y.Doc meta map
+  // so Yjs broadcasts the title update in real-time to open editor tabs!
+  const room = rooms.get(req.params.id);
+  if (room) {
+    const meta = room.ydoc.getMap('meta');
+    if (meta.get('title') !== title) {
+      meta.set('title', title);
+    }
+  }
+
+  res.json(updatedDoc);
 });
 
 documentsRouter.delete('/:id', (req, res) => {

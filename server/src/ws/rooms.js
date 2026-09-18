@@ -12,10 +12,16 @@ class Room {
     this.conns = new Set();
     this.persistTimer = null;
 
-    if (!getDocumentMeta(docId)) {
-      createDocument(docId, 'Без названия');
+    let meta = getDocumentMeta(docId);
+    if (!meta) {
+      meta = createDocument(docId, 'Без названия');
     }
     loadIntoYDoc(docId, this.ydoc);
+
+    const yMeta = this.ydoc.getMap('meta');
+    if (!yMeta.get('title') && meta?.title) {
+      yMeta.set('title', meta.title);
+    }
     this.ydoc.on('update', (update, origin) => {
       if (origin === 'persistence') return;
       appendUpdate(docId, update);

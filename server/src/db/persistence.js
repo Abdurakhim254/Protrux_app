@@ -75,7 +75,15 @@ export function loadIntoYDoc(docId, ydoc) {
 }
 
 
+export function ensureDocumentExists(id, title = 'Без названия') {
+  if (!stmts.getDoc.get(id)) {
+    const now = Date.now();
+    stmts.insertDoc.run(id, title, now, now);
+  }
+}
+
 export function appendUpdate(docId, update) {
+  ensureDocumentExists(docId);
   stmts.insertUpdate.run(docId, Buffer.from(update), Date.now());
   touchDocument(docId);
   const { n } = stmts.countUpdates.get(docId);
@@ -84,8 +92,8 @@ export function appendUpdate(docId, update) {
   }
 }
 
-
 export function compact(docId) {
+  ensureDocumentExists(docId);
   const tmp = new Y.Doc();
   loadIntoYDoc(docId, tmp);
   const state = Y.encodeStateAsUpdate(tmp);
@@ -96,8 +104,8 @@ export function compact(docId) {
   tmp.destroy();
 }
 
-
 export function snapshotYDoc(docId, ydoc) {
+  ensureDocumentExists(docId);
   const state = Y.encodeStateAsUpdate(ydoc);
   inTransaction(() => {
     stmts.upsertSnapshot.run(docId, Buffer.from(state), Date.now());
