@@ -20,6 +20,7 @@ import { usePresence } from '../lib/usePresence.js';
 import { useOutline } from '../lib/useOutline.js';
 import { getIdentity } from '../lib/user.js';
 import { api } from '../lib/api.js';
+import { FontSize } from '../lib/fontSize.js';
 import Toolbar from '../components/Toolbar.jsx';
 import PresenceBar from '../components/PresenceBar.jsx';
 import ConnectionStatus from '../components/ConnectionStatus.jsx';
@@ -87,6 +88,7 @@ export default function EditorPage() {
       Image,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       TextStyle,
+      FontSize,
       Color,
       Highlight.configure({ multicolor: true }),
       TaskList,

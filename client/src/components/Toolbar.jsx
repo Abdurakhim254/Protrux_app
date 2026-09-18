@@ -116,6 +116,75 @@ function SwatchPicker({ title, swatches, onPick, onClear, current }) {
   );
 }
 
+function FontSizePicker({ editor }) {
+  const currentFontSizeStr = editor?.getAttributes('textStyle')?.fontSize;
+  const parsedSize = currentFontSizeStr ? parseInt(currentFontSizeStr, 10) : 16;
+  const [sizeInput, setSizeInput] = useState(String(parsedSize));
+
+  useEffect(() => {
+    setSizeInput(String(parsedSize));
+  }, [parsedSize]);
+
+  function applySize(newSize) {
+    const val = Math.min(Math.max(Number(newSize) || 16, 8), 96);
+    setSizeInput(String(val));
+    editor.chain().focus().setFontSize(`${val}px`).run();
+  }
+
+  function handleDecrement() {
+    applySize(parsedSize - 1);
+  }
+
+  function handleIncrement() {
+    applySize(parsedSize + 1);
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applySize(sizeInput);
+    }
+  }
+
+  function handleBlur() {
+    applySize(sizeInput);
+  }
+
+  return (
+    <div className="tb-fontsize-group" title="Размер шрифта">
+      <button
+        type="button"
+        className="tb-btn tb-btn--step"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={handleDecrement}
+        title="Уменьшить размер шрифта"
+        aria-label="Уменьшить размер шрифта"
+      >
+        −
+      </button>
+      <input
+        type="text"
+        className="tb-fontsize-input"
+        value={sizeInput}
+        onChange={(e) => setSizeInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        aria-label="Размер шрифта"
+      />
+      <button
+        type="button"
+        className="tb-btn tb-btn--step"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={handleIncrement}
+        title="Увеличить размер шрифта"
+        aria-label="Увеличить размер шрифта"
+      >
+        +
+      </button>
+    </div>
+  );
+}
+
 export default function Toolbar({ editor }) {
   if (!editor) return null;
 
@@ -166,6 +235,10 @@ export default function Toolbar({ editor }) {
         <option value="h2">Заголовок 2</option>
         <option value="h3">Заголовок 3</option>
       </select>
+
+      <div className="tb-divider" />
+
+      <FontSizePicker editor={editor} />
 
       <div className="tb-divider" />
 
